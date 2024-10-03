@@ -8,7 +8,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
@@ -170,7 +169,6 @@ scripts/flow/*/.flowconfig
 .grunt
 _SpecRunner.html
 _benchmarks_
-build/
 remote-repo/
 coverage/
 .module-cache
