@@ -19,7 +19,7 @@ class Post(models.Model):
     user_long = models.DecimalField(max_digits=22, decimal_places=16, blank=True, null=True)
     user_lat = models.DecimalField(max_digits=22, decimal_places=16, blank=True, null=True)
 
-    user_account_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    username = models.ForeignKey(User, on_delete=models.CASCADE, to_field='username')
     post_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     post_budget = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     is_negotiable = models.BooleanField(default=True)
