@@ -19,7 +19,13 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        print(f"DATA RECEIVED FROM CREATE USER API: {validated_data}")
+        """
+        Args:
+            validated_data (_type_): Data received from request (POST)
+
+        Returns:
+            _type_: User object in JSON format
+        """
 
         user = super(UserSerializer, self).create(validated_data)
 
@@ -28,6 +34,15 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update_user(self, instance, validated_data):
+        """Updates user instance
+
+        Args:
+            instance (_type_): Instance of User model
+            validated_data (_type_): Data received from request
+
+        Returns:
+            _type_: Returns the User object with updated fields in JSON format
+        """
         instance.username = validated_data.get('username', instance.username)
         instance.email = validated_data.get('email', instance.email)
         instance.phone_number = validated_data.get('phone_number', instance.phone_number)

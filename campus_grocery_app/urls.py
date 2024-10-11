@@ -22,13 +22,8 @@ from rest_framework_simplejwt.views import (TokenObtainPairView,
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('', include('core.urls')),
     path('apis/token/', csrf_exempt(TokenObtainPairView.as_view()), name='token-obtain-pair'),
     path('apis/token/refresh/', csrf_exempt(TokenRefreshView.as_view()), name='token-refresh'),
     path('apis/rest/', include('user_accounts.urls')),
-    # path('apis/rest/', include('ingredients.urls')),
     path('apis/rest/', include('recipes.urls'))
-    # path('ingredients/', include('ingredients.urls')),
-    # path('marketplace/', include('marketplace.urls')),
-    # path('recipes/', include('recipes.urls')),
 ]
