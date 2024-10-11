@@ -4,25 +4,24 @@ from .models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = [
+        fields = (
             'id',
             'username',
             'email',
             'phone_number',
             'address',
             'role',
-            'admin'
-        ]
-
-    def create_user(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data.get('email', ''),
-            phone_number=validated_data.get('phone_number', ''),
-            address=validated_data.get('address', ''),
-            role=validated_data.get('role', 'student'),
-            admin=validated_data.get('admin', False)
+            'admin',
+            'password'
         )
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def create(self, validated_data):
+        print(f"DATA RECEIVED FROM CREATE USER API: {validated_data}")
+
+        user = super(UserSerializer, self).create(validated_data)
 
         user.set_password(validated_data['password'])
         user.save()
@@ -37,7 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
         instance.admin = validated_data.get('admin', instance.admin)
 
         if 'password' in validated_data:
-            instance.set_password(validated_data['passowrd'])
+            instance.set_password(validated_data['password'])
 
         instance.save()
         return instance

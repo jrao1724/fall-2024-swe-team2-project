@@ -34,7 +34,7 @@ class Post(models.Model):
 
     def __str__(self):
         return str(self.post_title)
-    
+
     @property
     def is_buy_or_sell(self):
         return str(self.post_type)
