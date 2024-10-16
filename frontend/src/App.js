@@ -6,6 +6,8 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import HomePage from './pages/HomePage';
+import AddEditRecipe from './pages/AddEditRecipe';
+import ViewRecipe from './pages/ViewRecipe';
 import theme from './theme';
 
 function App() {
@@ -18,6 +20,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/home" element={<HomePage />} />
+        <Route path="/add_edit_recipe" element={<AddEditRecipe />} />
+        <Route path="/view_recipe" element={<ViewRecipe />} />
       </Routes>
     </Router>
     </ThemeProvider>
