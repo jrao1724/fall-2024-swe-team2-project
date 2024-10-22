@@ -1,5 +1,5 @@
 """
-URL configuration for new_proj project.
+URL configuration for campus_grocery_app project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -15,10 +15,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from django.views.generic import TemplateView
+from django.urls import include, path
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework_simplejwt.views import (TokenObtainPairView,
+                                            TokenRefreshView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',TemplateView.as_view(template_name='index.html')),
+    path('apis/token/', csrf_exempt(TokenObtainPairView.as_view()), name='token-obtain-pair'),
+    path('apis/token/refresh/', csrf_exempt(TokenRefreshView.as_view()), name='token-refresh'),
+    path('apis/rest/', include('user_accounts.urls')),
+    path('apis/rest/', include('recipes.urls'))
 ]
