@@ -20,9 +20,11 @@ import {
   Modal,
   Box,
   Fab,
+  Rating
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddIcon from '@mui/icons-material/Add'; 
+import { Link, useNavigate } from 'react-router-dom';
 
 const recipes = ['Pasta', 'Pizza', 'Salad', 'Soup', 'Curry'];
 
@@ -66,6 +68,13 @@ const Recipes = () => {
   const handleOpenMade = () => setOpenMade(true);
   const handleCloseMade = () => setOpenMade(false);
 
+  const navigate = useNavigate();
+
+  const handleAddEditRecipe = () => {
+    navigate('/add_edit_recipe'); 
+  };
+
+
   return (
     <Container>
       <Autocomplete
@@ -80,7 +89,7 @@ const Recipes = () => {
             />
           )}
         />
-      <Grid2 container spacing={4}>
+      <Grid2 container spacing={2}>
       <Grid2 item xs={12} md={6}>
         <Paper elevation={3} style={{ padding: '20px', height: '100%' }}>
           <Typography variant="h6" align="center" gutterBottom fontWeight="bold">
@@ -107,8 +116,8 @@ const Recipes = () => {
                       <TableRow key={index}>
                         <TableCell>{recipe.name}</TableCell>
                         <TableCell>{recipe.restriction}</TableCell>
-                        <TableCell>{recipe.rating}</TableCell>
-                        <TableCell>{recipe.time}</TableCell>
+                        <TableCell><Rating value={recipe.rating} size="small" precision={0.5} readOnly /></TableCell>
+                        <TableCell>{recipe.time}</TableCell> 
                       </TableRow>
                     ))}
                   </TableBody>
@@ -142,7 +151,7 @@ const Recipes = () => {
                     <TableRow>
                       <TableCell>Name</TableCell>
                       <TableCell>Restriction</TableCell>
-                      <TableCell>Rating</TableCell>
+                      <TableCell>Rating  </TableCell>
                       <TableCell>Time</TableCell>
                     </TableRow>
                   </TableHead>
@@ -151,7 +160,7 @@ const Recipes = () => {
                       <TableRow key={index}>
                         <TableCell>{recipe.name}</TableCell>
                         <TableCell>{recipe.restriction}</TableCell>
-                        <TableCell>{recipe.rating}</TableCell>
+                        <TableCell><Rating value={recipe.rating} size="small" precision={0.5} readOnly /></TableCell>
                         <TableCell>{recipe.time}</TableCell>
                       </TableRow>
                     ))}
@@ -210,7 +219,7 @@ const Recipes = () => {
                     <TableRow key={index}>
                       <TableCell>{recipe.name}</TableCell>
                       <TableCell>{recipe.restriction}</TableCell>
-                      <TableCell>{recipe.rating}</TableCell>
+                      <TableCell><Rating value={recipe.rating} size="small" precision={0.5} readOnly /></TableCell>
                       <TableCell>{recipe.time}</TableCell>
                     </TableRow>
                   ))}
@@ -254,7 +263,7 @@ const Recipes = () => {
                     <TableRow key={index}>
                       <TableCell>{recipe.name}</TableCell>
                       <TableCell>{recipe.restriction}</TableCell>
-                      <TableCell>{recipe.rating}</TableCell>
+                      <TableCell><Rating value={recipe.rating} size="small" precision={0.5} readOnly /></TableCell>
                       <TableCell>{recipe.time}</TableCell>
                     </TableRow>
                   ))}
@@ -266,7 +275,7 @@ const Recipes = () => {
       </Grid2>
 
       <Grid2 item xs={12} md={6}>
-        <Paper elevation={3} style={{ padding: '20px', height: '100%' }}>
+        <Paper elevation={3} style={{ padding: '20px', height: '100%'}}>
           <Typography variant="h6" align="center" gutterBottom fontWeight="bold">
             Recipes You Made
           </Typography>
@@ -287,10 +296,10 @@ const Recipes = () => {
                   <TableRow key={index}>
                     <TableCell>{recipe.name}</TableCell>
                     <TableCell>{recipe.restriction}</TableCell>
-                    <TableCell>{recipe.rating}</TableCell>
+                    <TableCell><Rating value={recipe.rating} size="small" precision={0.5} readOnly /></TableCell>
                     <TableCell>{recipe.time}</TableCell>
                     <TableCell>
-                      <Button variant="outlined" sx={{ color: '#ffb74d', borderColor: '#ffb74d' }}>
+                      <Button variant="outlined" sx={{ color: '#ffb74d', borderColor: '#ffb74d' }} onClick={handleAddEditRecipe}>
                         Edit
                       </Button>
                     </TableCell>
@@ -321,6 +330,7 @@ const Recipes = () => {
                 backgroundColor: '#ffb74d',
                 color: 'white',
               }}
+              onClick={handleAddEditRecipe}
             >
               <AddIcon />
             </Fab>
@@ -360,7 +370,7 @@ const Recipes = () => {
                     {recipesYouMade.map((recipe, index) => (
                       <TableRow key={index}>
                         <TableCell>{recipe.name}</TableCell>
-                        <TableCell>{recipe.restriction}</TableCell>
+                        <TableCell><Rating value={recipe.rating} size="small" precision={0.5} readOnly /></TableCell>
                         <TableCell>{recipe.rating}</TableCell>
                         <TableCell>{recipe.time}</TableCell>
                       </TableRow>
