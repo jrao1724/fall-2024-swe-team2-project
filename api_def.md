@@ -1,7 +1,9 @@
 # API Design
 
+**Prefix:** `/apis/`
+
 ### User Login:
-- `/login/`: returns an access token and refresh token to authenticate the user's session
+- `/token/`: returns an access token and refresh token to authenticate the user's session
     - method: `POST`
     - request: 
         ```json
@@ -18,7 +20,7 @@
         }
         ```
 
-- `/login/refresh/`: when the access token expires, ping this for a new access token by utilizing the refresh token.
+- `/token/refresh/`: when the access token expires, ping this for a new access token by utilizing the refresh token.
     - method: `POST`
     - request: 
         ```json
@@ -34,7 +36,7 @@
         ```
 
 ### User-Related Functions:
-- `/users/addUser/`: create a new user account
+- `/rest/users/addUser/`: create a new user account
     - method: `POST`
     - request: 
         ```json
@@ -57,7 +59,7 @@
             "username": <username>
         }
         ```
-- `/users/getUserInfo`: retrieve a user's info (email, phone number, etc.)
+- `/rest/users/getUserInfo`: retrieve a user's info (email, phone number, etc.)
     - method: `POST`
     - Bearer Access Token required in headers
     - request: 
@@ -83,8 +85,9 @@
         ```
 
 ### Recipe-Related Functions:
-- `/recipes/addRecipe/`: create a new user account
+- `/rest/recipes/addRecipe/`: create a new user account
     - method: `POST`
+    - Bearer Access Token required in headers
     - request: 
         ```json
         {
@@ -105,30 +108,51 @@
             "username": <username>
         }
         ```
-- `/users/getUserInfo`: retrieve a user's info (email, phone number, etc.)
+
+- `/rest/recipes/search`: returns recipes according to the food restriction, allergens, or recipe name search query
     - method: `POST`
     - Bearer Access Token required in headers
-    - request: 
+    - request:
         ```json
         {
-            "username": <username>
+            "search": "chocolate cake",
+            "restrictions": ["Vegan", "Gluten Free"],
+            "allergens": ["Dairy", "Nuts"]
         }
-        ```
     - response:
         ```json
-        {
-            "status": 200 | 400,
-            "data": {
-                "username": "[max length of 30]",
-                "first_name": <first_name>,
-                "last_name": <last_name>,
-                "email": "student@example.com",
-                "phone_number": "14081234567",
-                "address": "6 MetroTech",
-                "role": "student"
-            }
-        }
+        [
+            {
+                "recipe_id": 1,
+                "recipe_name": "Vegan Chocolate Cake",
+                "difficulty_level": "medium",
+                "quickness": 45,
+                "time_units": "minutes",
+                "nutrition": {
+                    "calories": 350,
+                    "protein": "5g",
+                    "carbohydrates": "50g",
+                    "fat": "15g"
+                },
+                "ingredients": [
+                    {
+                        "id": 1,
+                        "name": "Cocoa powder",
+                        "allergens": [],
+                        "restrictions": ["Vegan", "Gluten Free"]
+                    },
+                    {
+                        "id": 2,
+                        "name": "Coconut milk",
+                        "allergens": [],
+                        "restrictions": ["Vegan"]
+                    }
+                ],
+                "restrictions": ["Vegan", "Gluten Free"],
+                "allergens": [],
+                "rating": 4.7,
+                "image": "/media/recipe_images/vegan_chocolate_cake.jpg",
+                "created_by": "test_user@gmail.com"
+            },
+        ]
         ```
-
-
-    

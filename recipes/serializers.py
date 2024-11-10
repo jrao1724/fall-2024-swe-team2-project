@@ -1,14 +1,16 @@
 from rest_framework import serializers
-from .models import Recipe
+from .models import Recipe, Allergen, DietaryRestriction
 
 class RecipeSerializer(serializers.ModelSerializer):
-    created_by_username = serializers.SerializerMethodField()
+    allergens = serializers.StringRelatedField(many=True)
+    restrictions = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Recipe
-        fields = ['id', 'name', 'difficulty_level', 'quickness', 'nutritional_facts', 
-                  'ingredients', 'restrictions', 'allergens', 'rating', 'image', 'created_by_username']
-        read_only_fields = ['created_by_username']
+        fields = [
+            'recipe_id', 'recipe_name', 'difficulty_level', 'quickness', 'nutrition',
+            'ingredients', 'restrictions', 'allergens', 'rating', 'image', 'created_by'
+        ]
 
     def get_created_by_username(self, obj):
         """Return the User who created a given recipe

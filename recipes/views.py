@@ -1,5 +1,5 @@
 from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from .models import Recipe
 from .serializers import RecipeSerializer
@@ -38,17 +38,31 @@ class RecipeCheckExistsView(generics.GenericAPIView):
             return Response({'exists': True}, status=status.HTTP_200_OK)
         return Response({'exists': False}, status=status.HTTP_200_OK)
 
-# List the recipes that meet the provided food restriction
-class RecipeFilterByRestrictionView(generics.ListAPIView):
-    serializer_class = RecipeSerializer
+# List the recipes that meet the provided keyword, dietary restriction, and/or allergy
 
-    def get_queryset(self):
-        """Returns recipes based on food restrictions
+class RecipeSearchFilterAPIView(generics.GenericAPIView):
+    """
+    POST API for searching recipes by name, multiple restrictions, and multiple allergens.
+    """
 
-        Returns:
-            _type_: _description_
-        """
-        restriction = self.request.query_params.get('restriction', None)
-        if restriction:
-            return Recipe.objects.filter(restrictions=restriction)
-        return Recipe.objects.none()
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        search_data = request.data
+        keyword = search_data.get('search', "")
+        restriction_ids = search_data.get('restrictions', [])
+        allergen_ids = search_data.get('allergens', [])
+
+        queryset = Recipe.objects.all()
+
+        if keyword:
+            queryset = queryset.filter(recipe_name__icontains=keyword)
+
+        if restriction_ids:
+            queryset = queryset.filter(restrictions__id__in=restriction_ids).distinct()
+
+        if allergen_ids:
+            queryset = queryset.filter(allergens__id__in=allergen_ids).distinct()
+
+        serializer = RecipeSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
