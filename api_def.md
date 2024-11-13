@@ -96,8 +96,10 @@
             "time_to_prepare": <integer value>,
             "time_unit": "min" | "hr",
             "ingredients": [list of ingredient IDs],
-            "restrictions": "vegetarian" | "vegan" | "none",
-            "rating": <1 - 5 floating point value, initialized as 0>
+            "restrictions": ["list of restrictions"],
+            "allergens": ["list of allergens"],
+            "rating": <1 - 5 floating point value, initialized as 0>,
+            "description": "HTML formatted string"
         }
         ```
     - response:
