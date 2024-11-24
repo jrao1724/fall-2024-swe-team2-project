@@ -9,6 +9,8 @@ from rest_framework import status
 from .models import User
 from .serializers import UserSerializer
 
+from django.http import HttpResponse
+
 # Create your views here.
 
 # API for listing users or creating a new user
@@ -16,6 +18,9 @@ class UserListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
+    def my_view():
+        return HttpResponse("Success", status=200)
 
 # API to retrieve/update/delete a specific user
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):

@@ -1,27 +1,55 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Typography, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import API_BASE_URL from '../constants';
 
 const SignUpPage = () => {
+  const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
-  const [userType, setUserType] = useState('');
+  const [role, setRole] = useState('');
   const [groupAssociation, setGroupAssociation] = useState('');
   const navigate = useNavigate();
 
-  const handleSignUp = (event) => {
+  const handleSignUp = async (event) => {
     event.preventDefault();
-    // Add signup logic here
-    console.log('Sign Up submitted', { firstName, lastName, email, password, userType, groupAssociation });
 
-    const form = event.currentTarget;
+    const userData = {
+      username: username,
+      password: password,
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+      phone_number: phoneNumber,
+      address: address,
+      role: role,
+    };
+    console.log('Sending User Data:', JSON.stringify(userData));
+    
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/apis/rest/users/addUser/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
 
-    if (form.checkValidity()) {
-        // Form is valid, navigate to login
+      const data = await response.json();
+      if (response.ok) {
         navigate('/login');
+        console.log('Sign up successful:', data);
+      } else {
+        console.error(`Sign Up Failed: ${data.msg}`);
       }
+    } catch (error) {
+      console.error('Sign up error:', error);
+    } 
 
   };
 
@@ -56,11 +84,42 @@ const SignUpPage = () => {
           margin="normal"
           required
           fullWidth
+          label="User Name"
+          autoComplete="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
           label="Email Address"
           type="email"
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+        />
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          label="Phone Number"
+          type="tel"
+          autoComplete="tel"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+        />
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          label="Address"
+          autoComplete="address-line1" 
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
         />
         <TextField
           variant="outlined"
@@ -78,20 +137,21 @@ const SignUpPage = () => {
         <FormControl fullWidth margin="normal" required>
           <InputLabel>User Type</InputLabel>
           <Select
-            value={userType}
+            value={role}
             onChange={(e) => {
-              setUserType(e.target.value);
+              setRole(e.target.value);
               setGroupAssociation(''); // Reset group association when changing user type
             }}
           >
             <MenuItem value="student">Student</MenuItem>
             <MenuItem value="foodBankCustomer">Food Bank Customer</MenuItem>
-            <MenuItem value="studentGroupMember">Student Group Member</MenuItem>
+            <MenuItem value="studentGroup">Student Group</MenuItem>
+            <MenuItem value="vendor">Vendor</MenuItem>
           </Select>
         </FormControl>
 
         {/* Group Association Field (Conditionally Rendered) */}
-        {(userType === 'foodBankCustomer' || userType === 'studentGroupMember') && (
+        {(role === 'foodBankCustomer' || role === 'studentGroup' || role === 'vendor') && (
           <TextField
             variant="outlined"
             margin="normal"
