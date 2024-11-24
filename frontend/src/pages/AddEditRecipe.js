@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import UploadIcon from '@mui/icons-material/Upload';
 import { useNavigate } from 'react-router-dom';
+import ingredientData from '../ingredients.json'
 
 const AddEditRecipe = () => {
   // Stepper state
@@ -45,6 +46,10 @@ const AddEditRecipe = () => {
     'Upload Image',
     'Add/Edit Recipe'
   ];
+
+  //ingredients to be shown
+  const ingredientArray = Object.values(ingredientData);
+  console.log(ingredientArray);
 
   const [dishNameError, setDishNameError] = useState(false);
   const [timeError, setTimeError] = useState(false);
@@ -186,7 +191,7 @@ const AddEditRecipe = () => {
           <Box>
             <Autocomplete
               freeSolo
-              options={['Tomato', 'Potato', 'Chilli']} // Example options
+              options={ingredientArray} // Example options
               value={inputIngredient}
               onChange={(event, newValue) => setInputIngredient(newValue)}
               renderInput={(params) => <TextField {...params} label="Select Ingredient" margin="normal" />}
