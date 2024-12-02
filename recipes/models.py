@@ -38,11 +38,33 @@ class Recipe(models.Model):
     
     restrictions = models.ManyToManyField(DietaryRestriction, related_name="recipes", blank=True)
     allergens = models.ManyToManyField(Allergen, related_name="recipes", blank=True)
-    
-    rating = models.DecimalField(max_digits=2, decimal_places=1, default=0.0)
+
     image = models.ImageField(upload_to='recipe_images/', blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField()
 
+    def update_average_rating(self):
+        ratings = self.ratings.all()
+        self.average_rating = sum(r.rating for r in ratings) / ratings.count() if ratings else 0
+        self.save()
+
     def __str__(self):
         return str(self.recipe_name)
+
+
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ratings')
+    rating = models.IntegerField()  # 1 to 5 stars, adjust as needed
+
+    class Meta:
+        unique_together = ('user', 'recipe')  # Prevent multiple ratings for the same recipe by the same user
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.recipe.update_average_rating()
+
+    def delete(self, *args, **kwargs):
+        recipe = self.recipe
+        super().delete(*args, **kwargs)
+        recipe.update_average_rating()
