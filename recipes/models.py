@@ -33,15 +33,15 @@ class Recipe(models.Model):
     quickness = models.PositiveIntegerField(help_text="Time in minutes")
     time_unit = models.CharField(max_length=4, choices=TIME_UNITS, default='mins')
     nutrition = models.JSONField()
-    
-    ingredients = models.ManyToManyField('Ingredient', through='RecipeIngredient')
+
+    ingredients = models.TextField(default="")
     
     restrictions = models.ManyToManyField(DietaryRestriction, related_name="recipes", blank=True)
     allergens = models.ManyToManyField(Allergen, related_name="recipes", blank=True)
 
     image = models.ImageField(upload_to='recipe_images/', blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    description = models.TextField()
+    description = models.TextField(default="")
 
     def update_average_rating(self):
         ratings = self.ratings.all()
