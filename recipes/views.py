@@ -111,27 +111,27 @@ class RecipeSearchFilterAPIView(generics.GenericAPIView):
             )
         
 
-class RatingView(generics.CreateAPIView, generics.UpdateAPIView):
-    queryset = Rating.objects.all()
-    serializer_class = RatingSerializer
-    permission_classes = [IsAuthenticated]
+# class RatingView(generics.CreateAPIView, generics.UpdateAPIView):
+#     queryset = Rating.objects.all()
+#     serializer_class = RatingSerializer
+#     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return Response(Rating.objects.filter(user=self.request.user), status=status.HTTP_200_OK)
+#     def get_queryset(self):
+#         return Response(Rating.objects.filter(user=self.request.user), status=status.HTTP_200_OK)
 
-    def perform_create(self, serializer):
-        try:
-            serializer.save(user=self.request.user)
-            return Response(status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(e, status=status.HTTP_400_BAD_REQUEST)
+#     def perform_create(self, serializer):
+#         try:
+#             serializer.save(user=self.request.user)
+#             return Response(status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response(e, status=status.HTTP_400_BAD_REQUEST)
 
-    def perform_update(self, serializer):
-        try:
-            serializer.save(user=self.request.user)
-            return Response(status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(e, status=status.HTTP_400_BAD_REQUEST)
+#     def perform_update(self, serializer):
+#         try:
+#             serializer.save(user=self.request.user)
+#             return Response(status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response(e, status=status.HTTP_400_BAD_REQUEST)
         
 
 class SaveRecipeByUserView(generics.UpdateAPIView):
@@ -175,3 +175,27 @@ class UserCreatedRecipesView(generics.GenericAPIView):
         recipes = Recipe.objects.filter(created_by=user)
         serializer = RecipeSerializer(recipes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class UserSavedRecipesView(generics.GenericAPIView):
+    """
+    API to fetch recipes saved by the authenticated user.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        saved_recipes = user.saved_recipes.all()  # Access the saved recipes
+        serializer = RecipeSerializer(saved_recipes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class RateRecipeView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = RatingSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": "Recipe rated successfully!"}, status=status.HTTP_200_OK)
+    

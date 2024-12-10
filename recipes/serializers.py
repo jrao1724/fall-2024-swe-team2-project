@@ -58,8 +58,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     
 
 class RatingSerializer(serializers.ModelSerializer):
-    recipe_id = serializers.IntegerField(write_only=True)  # Input recipe ID
-    rating = serializers.IntegerField(min_value=1, max_value=5)  # Ensure rating is between 1 and 5
+    recipe_id = serializers.IntegerField(write_only=True)
+    rating = serializers.IntegerField(min_value=1, max_value=5)
     user = serializers.StringRelatedField(read_only=True)
 
     class Meta:
@@ -67,7 +67,6 @@ class RatingSerializer(serializers.ModelSerializer):
         fields = ['id', 'recipe_id', 'rating', 'user']
 
     def validate_recipe_id(self, value):
-        from .models import Recipe
         try:
             Recipe.objects.get(id=value)
         except Recipe.DoesNotExist:
@@ -77,12 +76,11 @@ class RatingSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         recipe_id = validated_data.pop('recipe_id')
         user = self.context['request'].user
-        from .models import Recipe
-        recipe = Recipe.objects.get(id=recipe_id)
+        recipe = Recipe.objects.get(recipe_id=recipe_id)
         rating, created = Rating.objects.update_or_create(
             user=user, recipe=recipe, defaults={'rating': validated_data['rating']}
         )
-        recipe.update_average_rating()  # Ensure the recipe's average rating is updated
+        recipe.update_average_rating() 
         return rating
 
     def update(self, instance, validated_data):
