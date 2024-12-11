@@ -1,31 +1,109 @@
-import React from 'react';
-import { Box, Card, CardContent, CardMedia, Typography, Chip, Grid2, Paper } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Card, CardContent, CardMedia, Typography, Chip, Stack, Paper, Rating, Button, CircularProgress } from '@mui/material';
+import { useParams } from 'react-router-dom';
+import API_BASE_URL from '../constants';
+import { refreshAccessToken } from '../apiRefresh';
 import '@fontsource/dancing-script';
 import '@fontsource/poppins';
 
 const ViewRecipe = () => {
-  // Sample data
-  const ingredients = [
-    '100 ml milk',
-    '50 g butter',
-    '3 eggs',
-    '1 tbs cocoa',
-    '2 tsp baking soda',
-    'a pinch of salt',
-  ];
+  // // Sample data
+  // const ingredients = [
+  //   '100 ml milk',
+  //   '50 g butter',
+  //   '3 eggs',
+  //   '1 tbs cocoa',
+  //   '2 tsp baking soda',
+  //   'a pinch of salt',
+  // ];
 
-  const restrictions = ['eggetarian', 'low fat', 'contains dairy'];
-  
-  const directions = `Preheat your oven to 180°C (350°F) and line a muffin tin with cupcake liners. In a bowl, mix sugar, flour, cocoa powder, baking powder, baking soda, and a pinch of salt. Add 1 egg, 50ml of milk, 50ml of vegetable oil, and 1/2 tsp of vanilla extract. Beat until smooth. Bake for 15-18 minutes, or until a toothpick inserted into the center comes out clean. Let the cupcakes cool in the pan for a few minutes before transferring to a wire rack to cool completely.`;
+  // const restrictions = ['eggetarian', 'low fat', 'contains dairy'];
+  // const directions = `Preheat your oven to 180°C (350°F) and line a muffin tin with cupcake liners. In a bowl, mix sugar, flour, cocoa powder, baking powder, baking soda, and a pinch of salt. Add 1 egg, 50ml of milk, 50ml of vegetable oil, and 1/2 tsp of vanilla extract. Beat until smooth. Bake for 15-18 minutes, or until a toothpick inserted into the center comes out clean. Let the cupcakes cool in the pan for a few minutes before transferring to a wire rack to cool completely.`;
+
+  const { recipeId } = useParams();
+  const [recipe, setRecipe] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [rating, setRating] = useState(0);
+  const [isSaved, setIsSaved] = useState(false);
+  const handleSave = () => {
+    setIsSaved(true);  
+  };
+  console.log(recipeId);
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      try {
+        const makeRequest = async (token) => {
+          const response = await fetch(`${API_BASE_URL}/apis/rest/recipes/recipeInfo/${recipeId}/`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+          });
+          return response;
+        };
+
+        let accessToken = localStorage.getItem('accessToken') || (await refreshAccessToken());
+        let response = await makeRequest(accessToken);
+
+        if (response.status === 401) {
+          accessToken = await refreshAccessToken();
+          response = await makeRequest(accessToken);
+        }
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data)
+          setRecipe(data);
+          setRating(data.rating || 0); // Assuming backend includes rating
+        } else {
+          setError('Failed to fetch recipe details.');
+        }
+      } catch (err) {
+        setError('An unexpected error occurred.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipe();
+  }, [recipeId]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Typography color="error" sx={{ textAlign: 'center', padding: 4 }}>
+        {error}
+      </Typography>
+    );
+  }
+
+  if (!recipe) {
+    return (
+      <Typography sx={{ textAlign: 'center', padding: 4 }}>
+        No recipe found.
+      </Typography>
+    );
+  }
+
+  const { recipe_name, difficulty_level, quickness, time_unit, description} = recipe;
+  const ingredients = recipe.ingredients ? recipe.ingredients.split(",").map((item) => item.trim()) : [];
+  const restrictions = recipe.restrictions || [];
+  const allergens = recipe.allergens || [];
 
   return (
     <Box
       sx={{
         display: 'flex',
         justifyContent: 'center',
-        backgroundColor: '#292828', 
         minHeight: '100vh',
         padding: 4,
+        backgroundImage: 'url(/background.jpg)',
+        backgroundSize: 'cover',
       }}
     >
       <Paper
@@ -43,7 +121,7 @@ const ViewRecipe = () => {
           <CardMedia
             component="img"
             height="300"
-            image={process.env.PUBLIC_URL + '/swepicstock.png'}
+            image={process.env.PUBLIC_URL + '/swepicstock.png'} //this will accept recipe.image when api returns image
             alt="Recipe Image"
           />
           <Card
@@ -61,14 +139,13 @@ const ViewRecipe = () => {
             }}
           >
             <Typography variant="h4" component="div" fontWeight="bold" style={{ fontFamily: 'Dancing Script' }}>
-              Chocolate Cupcake
+              {recipe_name}
             </Typography>
           </Card>
         </Box>
 
         {/* Recipe Details */}
         <CardContent sx={{ marginTop: 8 }}>
-          {/* Servings and Time */}
           <Box
             sx={{
               display: 'flex',
@@ -78,84 +155,109 @@ const ViewRecipe = () => {
             }}
           >
             <Typography variant="body1">
-              <strong>Servings:</strong> 2
+              <strong>Difficulty:</strong> {difficulty_level}
             </Typography>
             <Typography variant="body1">
-              <strong>Time to Completion:</strong> 45 min
+              <strong>Time to Completion:</strong> {quickness} {time_unit}
             </Typography>
-          </Box>
-
-          {/* Ingredients and Directions Section */}
-          <Grid2 container spacing={3} sx={{ marginBottom: 4 }}>
-            {/* Ingredients */}
-            <Grid2 item xs={12} md={6}>
-              <Box
-                sx={{
-                  border: '1px solid grey',
-                  borderRadius: 2,
-                  padding: 2,
-                  backgroundColor: '#f9f9f9',
-                }}
-              >
-                <Typography variant="h6" gutterBottom style={{ fontFamily: 'Poppins' }}>
-                  Ingredients
-                </Typography>
-                {ingredients.map((ingredient, index) => (
-                  <Chip
-                    color='secondary'
-                    key={index}
-                    label={ingredient}
-                    variant="outlined"
-                    sx={{ margin: 0.5 }}
-                  />
-                ))}
-              </Box>
-            </Grid2>
-
-            {/* Directions as a Paragraph */}
-            <Grid2 item xs={12} md={6}>
-              <Box
-                sx={{
-                  border: '1px solid grey',
-                  borderRadius: 2,
-                  padding: 2,
-                  backgroundColor: '#f9f9f9',
-                  textAlign: 'center', // Center-align the paragraph
-                }}
-              >
-                <Typography variant="h6" gutterBottom style={{ fontFamily: 'Poppins' }}>
-                  Directions
-                </Typography>
-                <Typography variant="body1" sx={{ textAlign: 'center', padding: '10px' }}>
-                  {directions}
-                </Typography>
-              </Box>
-            </Grid2>
-          </Grid2>
-
-          {/* Restriction & Dietary Info */}
+          </Box> 
+          <Stack spacing={2}>
+            <Box
+              sx={{
+                border: '1px solid grey',
+                borderRadius: 2,
+                padding: 2,
+                backgroundColor: '#f9f9f9',
+              }}
+            >
+              <Typography variant="h6" gutterBottom style={{ fontFamily: 'Poppins' }}>
+                Ingredients
+              </Typography>
+              {ingredients.map((ingredient, index) => (
+                <Chip
+                  color='secondary'
+                  key={index}
+                  label={ingredient}
+                  variant="outlined"
+                  sx={{ margin: 0.5 }}
+                />
+              ))}
+            </Box>           
+            <Box
+              sx={{
+                border: '1px solid grey',
+                borderRadius: 2,
+                padding: 2,
+                backgroundColor: '#f9f9f9',
+                textAlign: 'center', // Center-align the paragraph
+              }}
+            >
+              <Typography variant="h6" gutterBottom style={{ fontFamily: 'Poppins' }}>
+                Directions
+              </Typography>
+              <Typography variant="body1" sx={{ textAlign: 'center', padding: '10px' }}>
+                {description}
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                border: '1px solid grey',
+                borderRadius: 2,
+                padding: 2,
+                backgroundColor: '#f9f9f9',
+                textAlign: 'left',
+              }}
+            >
+              <Typography variant="h6" gutterBottom style={{ fontFamily: 'Poppins' }}>
+                Restriction & Allergens
+              </Typography>
+              {restrictions && 
+                restrictions.map((restriction, index) => (
+                    <Chip
+                      color='secondary'
+                      key={index}
+                      label={restriction}
+                      variant="outlined"
+                      sx={{ margin: 0.5 }}
+                    />
+                  ))}
+              {allergens && 
+                allergens.map((restriction, index) => (
+                    <Chip
+                      color='secondary'
+                      key={index}
+                      label={restriction}
+                      variant="outlined"
+                      sx={{ margin: 0.5 }}
+                    />
+                  ))}
+            </Box>  
+          </Stack>
           <Box
             sx={{
-              border: '1px solid grey',
-              borderRadius: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2,
               padding: 2,
-              backgroundColor: '#f9f9f9',
-              textAlign: 'left',
             }}
           >
-            <Typography variant="h6" gutterBottom style={{ fontFamily: 'Poppins' }}>
-              Restriction & Dietary Info
-            </Typography>
-            {restrictions.map((restriction, index) => (
-                  <Chip
-                    color='secondary'
-                    key={index}
-                    label={restriction}
-                    variant="outlined"
-                    sx={{ margin: 0.5 }}
-                  />
-                ))}
+            <Typography variant="h6" gutterBottom style={{ fontFamily: 'Poppins' }}>Rate This Recipe</Typography>
+            <Rating
+              value={rating}
+              onChange={(event, newValue) => setRating(newValue)}
+              precision={1}
+            />
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleSave}
+              disabled={isSaved}
+            >
+              {isSaved ? 'Saved' : 'Save'}
+            </Button>
           </Box>
+          
         </CardContent>
       </Paper>
     </Box>

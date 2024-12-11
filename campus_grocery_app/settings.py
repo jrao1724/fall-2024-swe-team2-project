@@ -30,6 +30,11 @@ SECRET_KEY = 'django-insecure-5p__i9w00ezq(a(o1fa-pbsbcf)(kiif8(yu*tl^6wsx9$x6gc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Image upload capability
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost",

@@ -199,3 +199,23 @@ class RateRecipeView(generics.GenericAPIView):
         serializer.save()
         return Response({"message": "Recipe rated successfully!"}, status=status.HTTP_200_OK)
     
+class FetchOtherUserRecipesView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            n = int(request.query_params.get('n', 3))
+            recipes = Recipe.objects.exclude(created_by=user)[:n]
+            serializer = RecipeSerializer(recipes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ValueError:
+            return Response(
+                {"error": "Incorrect value. Provide an integer."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {"error": f"An error occurred: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

@@ -21,7 +21,7 @@ function App() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/add_edit_recipe" element={<AddEditRecipe />} />
-        <Route path="/view_recipe" element={<ViewRecipe />} />
+        <Route path="/view_recipe/:recipeId" element={<ViewRecipe />} />
       </Routes>
     </Router>
     </ThemeProvider>
