@@ -36,7 +36,7 @@ jobs:
         python-version: 3.9
 
     - name: change to project directory
-      run: cd
+      run: ls  
 
     - name: Run migrations
       working-directory: backend
