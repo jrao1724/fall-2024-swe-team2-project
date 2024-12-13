@@ -39,6 +39,7 @@ jobs:
       run: cd <subdirectory>
 
     - name: Run migrations
+      working-directory: backend
       run: python manage.py migrate
 
     - name: Run tests
