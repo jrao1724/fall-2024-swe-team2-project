@@ -35,12 +35,14 @@ jobs:
       with:
         python-version: 3.9
 
-    - name: change to project directory
-      run: ls  
+    - name: List files in the repository
+  run: ls -R
 
     - name: Run migrations
-      working-directory: backend
-      run: python manage.py migrate
+  working-directory: ./backend 
+  run: python manage.py migrate
 
-    - name: Run tests
-      run: python manage.py test
+
+   - name: Run migrations
+  run: python manage.py migrate
+  working-directory: ${{ github.workspace }}/fall-2024-swe-team2-project/backend
