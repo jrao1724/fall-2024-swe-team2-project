@@ -35,10 +35,8 @@ jobs:
       with:
         python-version: 3.9
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+    - name: change to project directory
+      run: cd <subdirectory>
 
     - name: Run migrations
       run: python manage.py migrate
