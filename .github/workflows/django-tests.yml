@@ -22,28 +22,28 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: test_db
 
-    env:
-      DJANGO_SECRET_KEY: django-insecure-5p__i9w00ezq(a(o1fa-pbsbcf)(kiif8(yu*tl^6wsx9$x6g
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-        
-         - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        
-    - name: Run migrations
-      run: python manage.py migrate
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-    - name: Run tests
-      run: python manage.py test
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run migrations
+        working-directory: ./backend  # Adjust the path to where manage.py is located
+        run: python manage.py migrate
+
+      - name: Run tests
+        working-directory: ./backend  # Ensure tests run from the correct directory
+        run: python manage.py test
+
+   
 
  
