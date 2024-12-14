@@ -128,7 +128,7 @@ const AddEditRecipe = () => {
   };
 
   // Allergen selection management
-  const allergenOptions =  ['Peanuts', 'Tree Nuts', 'Milk', 'Eggs', 'Fish', 'Shellfish', 'Soy', 'Wheat', 'Sesame', 'Dairy'];
+  const allergenOptions =  ['Peanuts', 'Tree Nuts', 'Milk', 'Eggs', 'Fish', 'Shellfish', 'Soy', 'Wheat', 'Sesame'];
   const handleAllergenChange = (event) => {
     const selectedAllergen = event.target.name;
     setAllergens((prevAllergens) =>

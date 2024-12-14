@@ -7,28 +7,48 @@ import '@fontsource/dancing-script';
 import '@fontsource/poppins';
 
 const ViewRecipe = () => {
-  // // Sample data
-  // const ingredients = [
-  //   '100 ml milk',
-  //   '50 g butter',
-  //   '3 eggs',
-  //   '1 tbs cocoa',
-  //   '2 tsp baking soda',
-  //   'a pinch of salt',
-  // ];
-
-  // const restrictions = ['eggetarian', 'low fat', 'contains dairy'];
-  // const directions = `Preheat your oven to 180°C (350°F) and line a muffin tin with cupcake liners. In a bowl, mix sugar, flour, cocoa powder, baking powder, baking soda, and a pinch of salt. Add 1 egg, 50ml of milk, 50ml of vegetable oil, and 1/2 tsp of vanilla extract. Beat until smooth. Bake for 15-18 minutes, or until a toothpick inserted into the center comes out clean. Let the cupcakes cool in the pan for a few minutes before transferring to a wire rack to cool completely.`;
-
+  
   const { recipeId } = useParams();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rating, setRating] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
-  const handleSave = () => {
-    setIsSaved(true);  
+
+  const handleSave = async () => {
+    if (isSaved) return; // Prevent multiple saves
+  
+    try {
+      const makeRequest = async (token) => {
+        const response = await fetch(`${API_BASE_URL}/apis/rest/recipes/saveRecipe/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ recipe_id: recipeId }),
+        });
+        return response;
+      };
+  
+      let accessToken = localStorage.getItem('accessToken') || (await refreshAccessToken());
+      let response = await makeRequest(accessToken);
+  
+      if (response.status === 401) {
+        accessToken = await refreshAccessToken();
+        response = await makeRequest(accessToken);
+      }
+  
+      if (response.ok) {
+        setIsSaved(true); // Update state to reflect the recipe has been saved
+      } else {
+        console.error('Failed to save the recipe.');
+      }
+    } catch (error) {
+      console.error('An unexpected error occurred while saving the recipe:', error);
+    }
   };
+  
   console.log(recipeId);
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -65,6 +85,41 @@ const ViewRecipe = () => {
 
     fetchRecipe();
   }, [recipeId]);
+
+  useEffect(() => {
+    const rateRecipe = async () => {
+      try{
+        if (!rating || !recipeId) return; // Skip if rating is not set yet
+        const makeRequest = async (token) => {
+          const response = await fetch(`${API_BASE_URL}/apis/rest/recipes/rateRecipe/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ recipe_id: recipeId, rating: rating }),
+          });
+          return response;
+        };
+        let accessToken = localStorage.getItem('accessToken') || (await refreshAccessToken());
+        let response = await makeRequest(accessToken);
+
+        if (response.status === 401) {
+          accessToken = await refreshAccessToken();
+          response = await makeRequest(accessToken);
+        }
+
+        if (!response.ok) {
+          console.error('Failed to rate the recipe.');
+        }
+
+      } catch (error) {
+        console.error('An unexpected error occurred while rating the recipe:', error);
+      }
+    };
+
+    rateRecipe();
+  }, [rating, recipeId]);
 
   if (loading) {
     return (

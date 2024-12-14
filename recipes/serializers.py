@@ -3,13 +3,19 @@ from .models import Recipe, Allergen, DietaryRestriction, Rating
 from user_accounts.models import User
 
 class RecipeSerializer(serializers.ModelSerializer):
-    allergens = serializers.ListField(
-        child=serializers.CharField(), write_only=True
-    )  # Accepts strings for allergens
-    restrictions = serializers.ListField(
-        child=serializers.CharField(), write_only=True
-    )  # Accepts strings for restrictions
-
+    # allergens = serializers.ListField(
+    #     child=serializers.CharField(), write_only=True
+    # )  # Accepts strings for allergens
+    # restrictions = serializers.ListField(
+    #     child=serializers.CharField(), write_only=True
+    # )  # Accepts strings for restrictions
+    
+    restrictions = serializers.StringRelatedField(
+        many=True, read_only=True
+    )
+    allergens = serializers.StringRelatedField(
+        many=True, read_only=True
+    )
     class Meta:
         model = Recipe
         fields = [
@@ -68,7 +74,7 @@ class RatingSerializer(serializers.ModelSerializer):
 
     def validate_recipe_id(self, value):
         try:
-            Recipe.objects.get(id=value)
+            Recipe.objects.get(recipe_id=value)
         except Recipe.DoesNotExist:
             raise serializers.ValidationError("Recipe with this ID does not exist.")
         return value
@@ -99,13 +105,13 @@ class SaveRecipeSerializer(serializers.ModelSerializer):
 
     def validate_recipe_id(self, value):
         try:
-            Recipe.objects.get(id=value)
+            Recipe.objects.get(recipe_id=value)
         except Recipe.DoesNotExist:
             raise serializers.ValidationError("Recipe with this ID does not exist.")
         return value
 
     def update(self, instance, validated_data):
         recipe_id = validated_data.get('recipe_id')
-        recipe = Recipe.objects.get(id=recipe_id)
+        recipe = Recipe.objects.get(recipe_id=recipe_id)
         instance.saved_recipes.add(recipe)
         return instance
