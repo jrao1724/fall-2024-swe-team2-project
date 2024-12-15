@@ -118,7 +118,7 @@ const Recipes = () => {
                 <TableRow>
                   <TableCell>Name</TableCell>
                   <TableCell>Difficulty</TableCell>
-                  <TableCell>Rating</TableCell>
+                  <TableCell>Your Rating</TableCell>
                   <TableCell>Time</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
@@ -128,7 +128,7 @@ const Recipes = () => {
                   <TableRow key={recipe.recipe_id} style={{ height: '60px' }}>
                     <TableCell>{recipe.recipe_name}</TableCell>
                     <TableCell>{recipe.difficulty_level}</TableCell>
-                    <TableCell><Rating value={recipe.rating} size="small" precision={0.5} readOnly /></TableCell>
+                    <TableCell><Rating value={recipe.user_rating} size="small" precision={0.5} readOnly /></TableCell>
                     <TableCell>{`${recipe.quickness} ${recipe.time_unit}`}</TableCell>
                     <TableCell>
                       <Button
@@ -170,7 +170,7 @@ const Recipes = () => {
                   <TableRow key={recipe.recipe_id} style={{ height: '60px' }}>
                     <TableCell>{recipe.recipe_name}</TableCell>
                     <TableCell>{recipe.difficulty_level}</TableCell>
-                    <TableCell><Rating value={recipe.rating} size="small" precision={0.5} readOnly /></TableCell>
+                    <TableCell><Rating value={recipe.average_rating} size="small" precision={0.5} readOnly /></TableCell>
                     <TableCell>{`${recipe.quickness} ${recipe.time_unit}`}</TableCell>
                     <TableCell>
                       <Button

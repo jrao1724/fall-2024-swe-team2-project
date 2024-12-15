@@ -72,7 +72,7 @@ const ViewRecipe = () => {
           const data = await response.json();
           console.log(data)
           setRecipe(data);
-          setRating(data.rating || 0); // Assuming backend includes rating
+          setRating(data.user_rating || 0); // Assuming backend includes rating
         } else {
           setError('Failed to fetch recipe details.');
         }
@@ -147,8 +147,8 @@ const ViewRecipe = () => {
 
   const { recipe_name, difficulty_level, quickness, time_unit, description} = recipe;
   const ingredients = recipe.ingredients ? recipe.ingredients.split(",").map((item) => item.trim()) : [];
-  const restrictions = recipe.restrictions || [];
-  const allergens = recipe.allergens || [];
+  const restrictions = recipe.restrictions_display || [];
+  const allergens = recipe.allergens_display || [];
 
   return (
     <Box

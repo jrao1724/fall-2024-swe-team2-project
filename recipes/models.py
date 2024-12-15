@@ -43,9 +43,11 @@ class Recipe(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField(default="")
 
+    average_rating = models.FloatField(default=0.0)
+
     def update_average_rating(self):
         ratings = self.ratings.all()
-        self.average_rating = sum(r.rating for r in ratings) / ratings.count() if ratings else 0
+        self.average_rating = sum(r.rating for r in ratings) / ratings.count() if ratings.exists() else 0.0
         self.save()
 
     def __str__(self):
@@ -55,7 +57,7 @@ class Recipe(models.Model):
 class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ratings')
-    rating = models.IntegerField()  # 1 to 5 stars, adjust as needed
+    rating = models.IntegerField()
 
     class Meta:
         unique_together = ('user', 'recipe')  # Prevent multiple ratings for the same recipe by the same user

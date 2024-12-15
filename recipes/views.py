@@ -30,15 +30,10 @@ class RecipeListCreateView(generics.ListCreateAPIView):
     
 # API to get Recipe info
 class RecipeDetailView(generics.GenericAPIView):
-    """
-    API to retrieve recipe details by ID. Accepts both GET and POST.
-    """
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
     def get(self, request, recipe_id, *args, **kwargs):
         try:
             recipe = Recipe.objects.get(recipe_id=recipe_id)
-            serializer = RecipeSerializer(recipe)
+            serializer = RecipeSerializer(recipe, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Recipe.DoesNotExist:
             return Response({"error": "Recipe not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -96,7 +91,7 @@ class RecipeSearchFilterAPIView(generics.GenericAPIView):
                     allergens__name__in=[name.strip() for name in allergen_names]
                 ).distinct()
 
-            serializer = RecipeSerializer(queryset, many=True)
+            serializer = RecipeSerializer(queryset, many=True, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         except django.core.exceptions.FieldError as e:
@@ -109,29 +104,6 @@ class RecipeSearchFilterAPIView(generics.GenericAPIView):
                 {"error": f"An unexpected error occurred: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        
-
-# class RatingView(generics.CreateAPIView, generics.UpdateAPIView):
-#     queryset = Rating.objects.all()
-#     serializer_class = RatingSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def get_queryset(self):
-#         return Response(Rating.objects.filter(user=self.request.user), status=status.HTTP_200_OK)
-
-#     def perform_create(self, serializer):
-#         try:
-#             serializer.save(user=self.request.user)
-#             return Response(status=status.HTTP_200_OK)
-#         except Exception as e:
-#             return Response(e, status=status.HTTP_400_BAD_REQUEST)
-
-#     def perform_update(self, serializer):
-#         try:
-#             serializer.save(user=self.request.user)
-#             return Response(status=status.HTTP_200_OK)
-#         except Exception as e:
-#             return Response(e, status=status.HTTP_400_BAD_REQUEST)
         
 
 class SaveRecipeByUserView(generics.UpdateAPIView):
@@ -173,7 +145,7 @@ class UserCreatedRecipesView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         recipes = Recipe.objects.filter(created_by=user)
-        serializer = RecipeSerializer(recipes, many=True)
+        serializer = RecipeSerializer(recipes, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
@@ -186,7 +158,7 @@ class UserSavedRecipesView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         saved_recipes = user.saved_recipes.all()  # Access the saved recipes
-        serializer = RecipeSerializer(saved_recipes, many=True)
+        serializer = RecipeSerializer(saved_recipes, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
@@ -194,10 +166,30 @@ class RateRecipeView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        serializer = RatingSerializer(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"message": "Recipe rated successfully!"}, status=status.HTTP_200_OK)
+        recipe_id = request.data.get('recipe_id')
+        rating_value = request.data.get('rating')
+
+        if not recipe_id or not rating_value:
+            return Response({"error": "Recipe ID and rating are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            recipe = Recipe.objects.get(recipe_id=recipe_id)
+        except Recipe.DoesNotExist:
+            return Response({"error": "Recipe not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        rating, created = Rating.objects.update_or_create(
+            user=request.user,
+            recipe=recipe,
+            defaults={'rating': rating_value}
+        )
+
+        recipe.update_average_rating()
+
+        return Response({
+            "message": "Rating submitted successfully.",
+            "user_rating": rating.rating,
+            "average_rating": recipe.average_rating
+        }, status=status.HTTP_200_OK)
     
 class FetchOtherUserRecipesView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
