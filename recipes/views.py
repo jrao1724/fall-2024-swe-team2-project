@@ -105,7 +105,6 @@ class RecipeSearchFilterAPIView(generics.GenericAPIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-
 class SaveRecipeByUserView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = SaveRecipeSerializer

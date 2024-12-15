@@ -80,7 +80,7 @@ class RatingSerializer(serializers.ModelSerializer):
     recipe_id = serializers.IntegerField(write_only=True)
     rating = serializers.IntegerField(min_value=1, max_value=5)
     user = serializers.StringRelatedField(read_only=True)
-
+    
     class Meta:
         model = Rating
         fields = ['id', 'recipe_id', 'rating', 'user']
