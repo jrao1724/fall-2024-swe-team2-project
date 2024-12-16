@@ -1,17 +1,19 @@
 from rest_framework import serializers
 from .models import Recipe, Allergen, DietaryRestriction, Rating
 from user_accounts.models import User
+import json
 
 class RecipeSerializer(serializers.ModelSerializer):
     allergens = serializers.ListField(
-        child=serializers.CharField(), write_only=True
+        child=serializers.CharField(), write_only=True, required=False
     )
     restrictions = serializers.ListField(
-        child=serializers.CharField(), write_only=True
+        child=serializers.CharField(), write_only=True, required=False
     )
 
     average_rating = serializers.SerializerMethodField()
     user_rating = serializers.SerializerMethodField()
+    image = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Recipe
@@ -41,26 +43,52 @@ class RecipeSerializer(serializers.ModelSerializer):
         return value
 
     def validate_allergens(self, value):
-        for allergen_name in value:
-            if not Allergen.objects.filter(name__iexact=allergen_name).exists():
-                raise serializers.ValidationError(f"Allergen '{allergen_name}' does not exist.")
-        return value
+        if isinstance(value, str):
+            try:
+                allergens_list = [allergen.strip() for allergen in value.split(',')] 
+            except json.JSONDecodeError:
+                raise serializers.ValidationError("Invalid JSON format for allergens.")
+        elif isinstance(value, list):
+            allergens_list = value
+        else:
+            raise serializers.ValidationError("Allergens must be a JSON array or list.")
+
+        if not isinstance(allergens_list, list):
+            raise serializers.ValidationError("Allergens must be a list.")
+        return allergens_list
 
     def validate_restrictions(self, value):
-        for restriction_name in value:
-            if not DietaryRestriction.objects.filter(name__iexact=restriction_name).exists():
-                raise serializers.ValidationError(f"Dietary restriction '{restriction_name}' does not exist.")
-        return value
+        if isinstance(value, str):
+            try:
+                restrictions_list = [restriction.strip() for restriction in value.split(',')]
+            except json.JSONDecodeError:
+                raise serializers.ValidationError("Invalid JSON format for restrictions.")
+        elif isinstance(value, list):
+            restrictions_list = value
+        else:
+            raise serializers.ValidationError("Restrictions must be a JSON array or list.")
+
+        if not isinstance(restrictions_list, list):
+            raise serializers.ValidationError("Restrictions must be a list.")
+        return restrictions_list
 
     def create(self, validated_data):
+        print("VALIDATED_DATA:", validated_data)
         allergens_data = validated_data.pop('allergens', [])
+
         restrictions_data = validated_data.pop('restrictions', [])
+
         user = self.context['request'].user
 
         recipe = Recipe.objects.create(created_by=user, **validated_data)
 
-        allergens = Allergen.objects.filter(name__in=[name.strip() for name in allergens_data])
-        restrictions = DietaryRestriction.objects.filter(name__in=[name.strip() for name in restrictions_data])
+        allergens_list = [allergen.strip() for allergen in allergens_data[0].split(',')] 
+        restrictions_list = [restriction.strip() for restriction in restrictions_data[0].split(',')]
+
+        print(allergens_list, restrictions_list)
+
+        allergens = Allergen.objects.filter(name__in=[name.strip() for name in allergens_list])
+        restrictions = DietaryRestriction.objects.filter(name__in=[name.strip() for name in restrictions_list])
 
         recipe.allergens.set(allergens)
         recipe.restrictions.set(restrictions)
@@ -71,6 +99,9 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+
+        request = self.context.get('request')
+
         representation['allergens_display'] = [allergen.name for allergen in instance.allergens.all()]
         representation['restrictions_display'] = [restriction.name for restriction in instance.restrictions.all()]
         return representation
