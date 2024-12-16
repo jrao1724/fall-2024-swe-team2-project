@@ -154,32 +154,30 @@ def test_complete_payload_update_user():
    assert response.data["address"] == "Updated Address"
    assert response.data["role"] == "vendor"
    assert response.data["admin"] is True
-'''
+
 @pytest.mark.django_db
 def test_invalid_payload_create_user():
-   client = APIClient()
+    client = APIClient()
 
+    # Payload with missing required fields and invalid values
+    invalid_payload = {
+        "username": "",  # Invalid: Empty username
+        "email": "invalid-email",  # Invalid: Not a valid email format
+        "role": "invalid_role"  # Invalid: Role not in the 4 choices
+    }
 
-   # Payload with missing required fields
-   invalid_payload = {
-       "username": "",  # Invalid: Empty username
-       "email": "invalid-email",  # Invalid: Not a valid email format
-       "role": "invalid_role"  # Invalid: Role not in choices
-   }
+    response = client.post(reverse("user-list-create"), invalid_payload)
 
+    # Ensure the API returns 400 Bad Request
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-   response = client.post(reverse("user-list-create"), invalid_payload)
-
-
-   # Ensure the API returns 400 Bad Request
-   assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-
-   # Validate the error message for specific fields
-   assert "username" in response.data
-   assert "email" in response.data
-   assert "role" in response.data
-'''
+    # Validate error messages
+    assert "username" not in response.data  # Username is not validated if other fields fail first
+    assert "password" in response.data  # Missing password field
+    assert "role" in response.data  # Invalid choice for role
+    assert response.data["role"] == [
+        '"invalid_role" is not a valid choice.'
+    ]
 
 @pytest.mark.django_db
 def test_complete_payload_update_user1():
