@@ -27,7 +27,9 @@ urlpatterns = [
     path('apis/token/', csrf_exempt(TokenObtainPairView.as_view()), name='token-obtain-pair'),
     path('apis/token/refresh/', csrf_exempt(TokenRefreshView.as_view()), name='token-refresh'),
     path('apis/rest/', include('user_accounts.urls')),
-    path('apis/rest/', include('recipes.urls'))
+    path('apis/rest/', include('recipes.urls')),
+    path('apis/rest/', include('marketplace.urls')),
+    path('api-auth/', include('rest_framework.urls'))
 ]
 
 if settings.DEBUG:
