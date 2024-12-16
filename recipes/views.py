@@ -20,10 +20,14 @@ class RecipeListCreateView(generics.ListCreateAPIView):
         """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        recipe = serializer.save()  # 'created_by' is already handled in the serializer
+        recipe = serializer.save()
         headers = self.get_success_headers(serializer.data)
         return Response(
-            {"message": "Recipe created successfully!", "recipe_id": recipe.recipe_id},
+            {
+                "message": "Recipe created successfully!",
+                "recipe_id": recipe.recipe_id,
+                "image_url": request.build_absolute_uri(recipe.image.url) if recipe.image else None
+            },
             status=status.HTTP_201_CREATED,
             headers=headers
         )
@@ -56,8 +60,6 @@ class RecipeCheckExistsView(generics.GenericAPIView):
             recipe_ids = Recipe.objects.filter(name=recipe_name).values_list('id', flat=True)
             return Response({'exists': True, 'recipe_ids': list(recipe_ids)}, status=status.HTTP_200_OK)
         return Response({'exists': False}, status=status.HTTP_200_OK)
-
-# List the recipes that meet the provided keyword, dietary restriction, and/or allergy
 
 
 class RecipeSearchFilterAPIView(generics.GenericAPIView):
