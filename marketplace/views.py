@@ -93,3 +93,20 @@ class PostsByUserView(generics.ListAPIView):
 
     def get_queryset(self):
         return Post.objects.filter(created_by=self.request.user.username)
+    
+class FilterByTypeView(generics.ListAPIView):
+    """
+    Retrieve all active buy or sell posts
+    """
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        post_type = self.request.query_params.get('post_type', None)
+
+        queryset = Post.objects.filter(is_active=True)
+
+        if post_type in ['buying', 'selling']:
+            queryset = queryset.filter(post_type=post_type)
+
+        return queryset
