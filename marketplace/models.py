@@ -9,17 +9,10 @@ class Post(models.Model):
         ('selling', 'Selling')
     )
 
-    VISIBLE_CONTACT_FIELDS = (
-        ('email', 'Email'),
-        ('phone_number', 'Phone Number'),
-        ('address', 'Address')
-    )
-
     post_id = models.AutoField(primary_key=True)
-    user_long = models.DecimalField(max_digits=22, decimal_places=16, blank=True, null=True)
-    user_lat = models.DecimalField(max_digits=22, decimal_places=16, blank=True, null=True)
+    user_location = models.CharField(max_length=255, blank=True, null=True)
+    created_by = models.CharField(max_length=150, default="Anonymous")  # New field
 
-    username = models.ForeignKey(User, on_delete=models.CASCADE, to_field='username')
     post_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     post_budget = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     is_negotiable = models.BooleanField(default=True)
@@ -28,7 +21,7 @@ class Post(models.Model):
 
     post_description = models.TextField(blank=True, null=True)
     post_title = models.CharField(max_length=200)
-    visible_fields = ArrayField(models.CharField(max_length=30, choices=VISIBLE_CONTACT_FIELDS))
+    visible_fields = ArrayField(models.CharField(max_length=30), default=list)
 
     post_type = models.CharField(max_length=10, choices=POST_TYPE_CHOICES)
 
@@ -38,3 +31,4 @@ class Post(models.Model):
     @property
     def is_buy_or_sell(self):
         return str(self.post_type)
+
