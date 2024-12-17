@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Paper, Typography, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-//import API_BASE_URL from '../constants';
+import API_BASE_URL from '../constants';
 
 const SignUpPage = () => {
   const [username, setUsername] = useState('');
@@ -42,9 +42,8 @@ const SignUpPage = () => {
     
     
     try {
-      //const response = await fetch(`${API_BASE_URL}/apis/rest/users/addUser/`, {
-      const response = await fetch(`https://campus-cuisine-backend-f8fjfcd2agdacqef.eastus2-01.azurewebsites.net/apis/rest/users/addUser/`, {
-        //https://campus-cuisine-backend-f8fjfcd2agdacqef.eastus2-01.azurewebsites.net/apis/rest/users/addUser/
+      const response = await fetch(`${API_BASE_URL}/apis/rest/users/addUser/`, {
+      //const response = await fetch(`https://campus-cuisine-backend-f8fjfcd2agdacqef.eastus2-01.azurewebsites.net/apis/rest/users/addUser/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
