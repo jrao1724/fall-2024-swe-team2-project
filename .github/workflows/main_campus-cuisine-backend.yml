@@ -36,7 +36,6 @@ jobs:
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
       - name: Run tests
         run: |
-          source venv/bin/activate
           pip install pytest
           pytest --maxfail=1 --disable-warnings -q  
           
