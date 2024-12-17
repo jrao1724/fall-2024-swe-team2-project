@@ -42,7 +42,9 @@ const SignUpPage = () => {
     
     
     try {
-      const response = await fetch(`${API_BASE_URL}/apis/rest/users/addUser/`, {
+      //const response = await fetch(`${API_BASE_URL}/apis/rest/users/addUser/`, {
+      const response = await fetch(`https://campus-cuisine-backend-f8fjfcd2agdacqef.eastus2-01.azurewebsites.net/apis/rest/users/addUser/`, {
+        //https://campus-cuisine-backend-f8fjfcd2agdacqef.eastus2-01.azurewebsites.net/apis/rest/users/addUser/
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
