@@ -1,0 +1,42 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Create and start virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+
+      - name: Install dependencies
+        run: |
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Set DJANGO_SETTINGS_MODULE
+        run: |
+          export DJANGO_SETTINGS_MODULE=campus_grocery_app.settings  # Update this with your project name
+
+      - name: Run tests
+        run: |
+          source venv/bin/activate
+          pip install pytest
+          pytest --maxfail=1 --disable-warnings -q  # Customize pytest options as needed
