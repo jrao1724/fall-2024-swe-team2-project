@@ -29,8 +29,7 @@ urlpatterns = [
     path('apis/rest/', include('user_accounts.urls')),
     path('apis/rest/', include('recipes.urls')),
     path('apis/rest/', include('marketplace.urls')),
-    path('api-auth/', include('rest_framework.urls')),
-    path('', include('api.urls'))
+    path('api-auth/', include('rest_framework.urls'))
 ]
 
 if settings.DEBUG:
