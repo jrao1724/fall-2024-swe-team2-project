@@ -46,8 +46,11 @@ DATABASES = {
         "USER": CONNECTION_STR['user'],
         "PASSWORD": CONNECTION_STR['password'],
         'TEST': {
-           'NAME': 'test_campus_grocery_app_db',  # Test database name
-       },
+            'NAME': 'test_campus_grocery_app_db',  # Test database name
+            'USER': CONNECTION_STR['user'],       # You can specify a user for testing
+            'PASSWORD': CONNECTION_STR['password'], # Specify password for test DB
+            'HOST': CONNECTION_STR['host'],       # Test database host
+        },
     }
 }
 
