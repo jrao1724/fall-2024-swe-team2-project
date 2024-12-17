@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticate
 from rest_framework.response import Response
 from .models import Recipe, Rating, User
 from .serializers import RecipeSerializer, RatingSerializer, SaveRecipeSerializer
+from django.db.models import Q
 
 # Create your views here.
 # API to create new recipes
@@ -89,9 +90,10 @@ class RecipeSearchFilterAPIView(generics.GenericAPIView):
 
             # Filter by allergens using names
             if allergen_names:
-                queryset = queryset.filter(
-                    allergens__name__in=[name.strip() for name in allergen_names]
-                ).distinct()
+                for allergen in allergen_names:
+                    queryset = queryset.exclude(
+                        allergens__name__iexact=allergen.strip()
+                    )
 
             serializer = RecipeSerializer(queryset, many=True, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
