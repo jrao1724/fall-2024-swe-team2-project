@@ -45,6 +45,9 @@ DATABASES = {
         "HOST": CONNECTION_STR['host'],
         "USER": CONNECTION_STR['user'],
         "PASSWORD": CONNECTION_STR['password'],
+        'TEST': {
+           'NAME': 'test_campus_grocery_app_db',  # Test database name
+       },
     }
 }
 
