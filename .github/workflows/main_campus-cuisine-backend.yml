@@ -79,4 +79,4 @@ jobs:
         with:
           app-name: 'campus-cuisine-backend'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2E77... }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2D7717CF2E434C57BB084AAD3B9B34E1 }}
