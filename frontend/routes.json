@@ -1,0 +1,8 @@
+{
+    "routes": [
+      {
+        "route": "/apis/rest/*",
+        "rewrite": "https://campus-cuisine-backend-f8fjfcd2agdacqef.eastus2-01.azurewebsites.net/apis/rest/*"
+      }
+    ]
+  }

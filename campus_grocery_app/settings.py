@@ -92,6 +92,8 @@ TEMPLATES = [
     },
 ]
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 WSGI_APPLICATION = 'campus_grocery_app.wsgi.application'
 
 
@@ -188,3 +190,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = ['http://localhost:3000']
+CORS_ALLOWED_ORIGINS = [
+    'https://purple-desert-0f588b00f.4.azurestaticapps.net',  # Frontend domain
+]
+
+
