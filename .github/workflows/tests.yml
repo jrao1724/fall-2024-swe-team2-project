@@ -32,6 +32,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run tests
+        env:
+          DJANGO_SETTINGS_MODULE: campus_grocery_app.settings  # Explicitly set DJANGO_SETTINGS_MODULE in the environment
         run: |
           source venv/bin/activate
           pip install pytest
