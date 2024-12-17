@@ -30,11 +30,11 @@ jobs:
         run: |
           source venv/bin/activate
           pip install -r requirements.txt
+          pip install pytest-django  # Install pytest-django
 
       - name: Run tests
         env:
-          DJANGO_SETTINGS_MODULE: campus_grocery_app.settings  # Explicitly set DJANGO_SETTINGS_MODULE in the environment
+          DJANGO_SETTINGS_MODULE: campus_grocery_app.settings
         run: |
           source venv/bin/activate
-          pip install pytest
           pytest --maxfail=1 --disable-warnings -q  # Run the tests
