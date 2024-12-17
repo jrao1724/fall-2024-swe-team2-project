@@ -148,55 +148,52 @@ const AddEditRecipe = () => {
 
   const handleSubmit = async () => { 
      try{
-      // const formData = new FormData();
-      // formData.append(
-      //   "recipe_data",
-      //   JSON.stringify({
-      //     recipe_name: dishName,
-      //     difficulty_level: difficulty,
-      //     quickness: time,
-      //     time_unit: timeUnit,
-      //     ingredients: ingredientsString,
-      //     restrictions: restrictions,
-      //     allergens: allergens,
-      //     description: instructions,
-      //     rating: 0.0,
-      //     nutrition: {},
-      //   })
-      // );
+      const formData = new FormData();
 
-      // if (uploadedImage) {
-      //   formData.append("image", uploadedImage);
-      // } else {
-      //   console.error("No image uploaded!");
-      //   return;
-      // }
+      formData.append("recipe_name", dishName || "");
+      formData.append("difficulty_level", difficulty || "");
+      formData.append("quickness", String(time || ""));
+      formData.append("time_unit", timeUnit || "");
+      formData.append("nutrition", JSON.stringify({}));
+      formData.append("ingredients", ingredientsString || "");
+      formData.append("description", instructions || "");
+  
+      formData.append("allergens", allergens.join(","));
+      formData.append("restrictions", restrictions.join(","));
 
-      // for (let pair of formData.entries()) {
-      //   console.log(pair[0], pair[1]);
-      // }
+      if (uploadedImage) {
+        formData.append("image", uploadedImage);
+      } else {
+        console.error("No image uploaded!");
+        return;
+      }
 
-      const recipeData = {
-            recipe_name: dishName,
-            difficulty_level: difficulty.toLowerCase(),
-            quickness: parseInt(time),
-            time_unit: timeUnit,
-            ingredients: ingredientsString,
-            restrictions: restrictions,
-            allergens: allergens,
-            description: instructions,
-            nutrition: {"calories":0, "protein":0},
-          };
-      console.log('Sending Recipe Data:', JSON.stringify(recipeData));
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      // const recipeData = {
+      //       recipe_name: dishName,
+      //       difficulty_level: difficulty.toLowerCase(),
+      //       quickness: parseInt(time),
+      //       time_unit: timeUnit,
+      //       ingredients: ingredientsString,
+      //       restrictions: restrictions,
+      //       allergens: allergens,
+      //       description: instructions,
+      //       nutrition: {"calories":0, "protein":0},
+      //     };
+      // console.log('Sending Recipe Data:', JSON.stringify(recipeData));
 
       const makeRequest = async (token) => {
         const response = await fetch(`${API_BASE_URL}/apis/rest/recipes/addRecipe/`,{
           method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            // 'Content-Type': 'application/json',
+            // 'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${token}`,
           },
-          body: JSON.stringify(recipeData),
+          body: formData,
         });
         return response
       };
@@ -216,7 +213,7 @@ const AddEditRecipe = () => {
         console.log("Recipe added successfully with ID:", data.recipe_id);
         alert("Recipe added successfully!");
       } else {
-        console.error("Error adding recipe:", data.message);
+        console.error("Error adding recipe:", data.statusText);
       }
      }catch (error){
       console.error("An unexpected error occurred:", error);

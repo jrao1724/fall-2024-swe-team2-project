@@ -73,19 +73,16 @@ class RecipeSerializer(serializers.ModelSerializer):
         return restrictions_list
 
     def create(self, validated_data):
-        print("VALIDATED_DATA:", validated_data)
+        print("HITTING HERE")
+        print("VALIDATED DATA:", validated_data)
         allergens_data = validated_data.pop('allergens', [])
-
         restrictions_data = validated_data.pop('restrictions', [])
-
         user = self.context['request'].user
 
-        recipe = Recipe.objects.create(created_by=user, **validated_data)
+        recipe = Recipe.objects.create(**validated_data)
 
         allergens_list = [allergen.strip() for allergen in allergens_data[0].split(',')] 
         restrictions_list = [restriction.strip() for restriction in restrictions_data[0].split(',')]
-
-        print(allergens_list, restrictions_list)
 
         allergens = Allergen.objects.filter(name__in=[name.strip() for name in allergens_list])
         restrictions = DietaryRestriction.objects.filter(name__in=[name.strip() for name in restrictions_list])
