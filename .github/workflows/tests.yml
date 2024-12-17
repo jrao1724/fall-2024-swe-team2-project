@@ -33,10 +33,10 @@ jobs:
 
       - name: Set DJANGO_SETTINGS_MODULE
         run: |
-          export DJANGO_SETTINGS_MODULE=campus_grocery_app.settings  # Update this with your project name
+          export DJANGO_SETTINGS_MODULE=campus_grocery_app.settings  # Updated with your project name
 
       - name: Run tests
         run: |
           source venv/bin/activate
           pip install pytest
-          pytest --maxfail=1 --disable-warnings -q  # Customize pytest options as needed
+          pytest --maxfail=1 --disable-warnings -q  # Run the tests
