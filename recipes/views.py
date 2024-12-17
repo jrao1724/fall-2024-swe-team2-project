@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from .models import Recipe, Rating, User
 from .serializers import RecipeSerializer, RatingSerializer, SaveRecipeSerializer
 from django.db.models import Q
+import json
 
 # Create your views here.
 # API to create new recipes
@@ -12,26 +13,51 @@ class RecipeListCreateView(generics.ListCreateAPIView):
     serializer_class = RecipeSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
-
     def create(self, request, *args, **kwargs):
         """
-        Override the create method to include the recipe ID in the response.
+        Manually clean and process request data.
         """
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        recipe = serializer.save()
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            {
-                "message": "Recipe created successfully!",
-                "recipe_id": recipe.recipe_id,
-                "image_url": request.build_absolute_uri(recipe.image.url) if recipe.image else None
-            },
-            status=status.HTTP_201_CREATED,
-            headers=headers
-        )
+        try:
+            print("Request data:", request.data)
+
+            # Manually extract values from QueryDict (single value for each key)
+            cleaned_data = {
+                "recipe_name": request.POST.get("recipe_name", "").strip(),
+                "difficulty_level": request.POST.get("difficulty_level", "").strip().lower(),
+                "quickness": int(request.POST.get("quickness", "0").strip()),
+                "time_unit": request.POST.get("time_unit", "").strip(),
+                "nutrition": json.loads(request.POST.get("nutrition", "{}").strip()),
+                "ingredients": request.POST.get("ingredients", "").strip(),
+                "description": request.POST.get("description", "").strip(),
+                "allergens": [allergen.strip() for allergen in request.POST.get("allergens", "").split(",")],
+                "restrictions": [restriction.strip() for restriction in request.POST.get("restrictions", "").split(",")],
+            }
+
+            image = request.FILES.get("image")
+
+            if image:
+                cleaned_data["image"] = image
+            else:
+                print("No image uploaded.")
+
+            print("Cleaned Data:", cleaned_data)
+
+            serializer = self.get_serializer(data=cleaned_data)
+            serializer.is_valid(raise_exception=True)
+
+            recipe = serializer.save(created_by=request.user)
+
+            return Response(
+                {
+                    "message": "Recipe created successfully!",
+                    "recipe_id": recipe.recipe_id,
+                    "image_url": request.build_absolute_uri(recipe.image.url) if recipe.image else None,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+        except Exception as e:
+            print("Error:", e)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 # API to get Recipe info
 class RecipeDetailView(generics.GenericAPIView):
