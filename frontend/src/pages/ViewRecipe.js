@@ -176,7 +176,8 @@ const ViewRecipe = () => {
           <CardMedia
             component="img"
             height="300"
-            image={process.env.PUBLIC_URL + '/swepicstock.png'} //this will accept recipe.image when api returns image
+            // image={process.env.PUBLIC_URL + '/swepicstock.png'} //this will accept recipe.image when api returns image
+            image={recipe.image}
             alt="Recipe Image"
           />
           <Card
