@@ -1,4 +1,3 @@
-
 name: Run Tests DB
 
 on:
@@ -16,7 +15,7 @@ jobs:
           POSTGRES_PASSWORD: password
           POSTGRES_DB: postgres
         ports:
-          - 5432:5432
+          - 5432:5432  # Expose PostgreSQL on port 5432
 
     steps:
       - uses: actions/checkout@v4
@@ -43,11 +42,18 @@ jobs:
             echo "Waiting for PostgreSQL to be ready..."
             sleep 1
           done
-          
+
+      - name: Set up environment variables for the database
+        run: |
+          echo "DB_NAME=postgres" >> $GITHUB_ENV
+          echo "DB_USER=postgres" >> $GITHUB_ENV
+          echo "DB_PASSWORD=password" >> $GITHUB_ENV
+          echo "DB_HOST=localhost" >> $GITHUB_ENV
+          echo "DB_PORT=5432" >> $GITHUB_ENV
+
       - name: Run tests
         env:
           DJANGO_SETTINGS_MODULE: campus_grocery_app.settings
-          DATABASE_URL: postgres://postgres:password@localhost:5432/postgres  # Set the correct DB URL
         run: |
           source venv/bin/activate
           pytest --maxfail=1 --disable-warnings -q  # Run the tests
