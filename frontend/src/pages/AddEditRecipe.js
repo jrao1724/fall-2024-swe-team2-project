@@ -305,6 +305,7 @@ const AddEditRecipe = () => {
               options={ingredientArray} // Example options
               value={inputIngredient}
               onChange={(event, newValue) => setInputIngredient(newValue)}
+              onInputChange={(event, newValue) => setInputIngredient(newValue)} 
               renderInput={(params) => <TextField {...params} label="Select Ingredient" margin="normal" />}
             />
             <Box display="flex" justifyContent="space-between" alignItems="center"> {/* Align amount and unit */}
