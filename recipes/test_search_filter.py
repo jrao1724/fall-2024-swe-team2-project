@@ -72,12 +72,13 @@ def test_filter_by_restrictions():
 
 @pytest.mark.django_db
 def test_filter_by_allergens():
-    client, _, _, allergen, _, recipe2, _ = setup()
+    client, _, restriction, allergen, recipe1, _, recipe3 = setup()
     url = reverse("recipe-filter-by-restriction")
     response = client.post(url, {"allergens": [allergen.name]}, format="json")
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
-    assert response.data[0]["recipe_name"] == recipe2.recipe_name
+    assert len(response.data) == 2
+    assert response.data[0]["recipe_name"] == recipe3.recipe_name
+    assert response.data[1]["recipe_name"] == recipe1.recipe_name
 
 @pytest.mark.django_db
 def test_combined_filters():

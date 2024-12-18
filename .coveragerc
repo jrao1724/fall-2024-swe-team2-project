@@ -1,0 +1,7 @@
+[coverage:run]
+# Include everything in the project (default is .)
+source = .
+
+# Omit settings.py and any migrations files
+omit =
+    campus_grocery_app/deployment.py
