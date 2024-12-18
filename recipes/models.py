@@ -1,6 +1,10 @@
 from django.db import models
 from ingredients.models import Ingredient, RecipeIngredient
 from user_accounts.models import User
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+import logging
+
 
 class Allergen(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -39,7 +43,7 @@ class Recipe(models.Model):
     restrictions = models.ManyToManyField(DietaryRestriction, related_name="recipes", blank=True)
     allergens = models.ManyToManyField(Allergen, related_name="recipes", blank=True)
 
-    image = models.ImageField(upload_to='recipe_images/', blank=True, null=True)
+    image = models.URLField(max_length=500, blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField(default="")
 
@@ -53,6 +57,14 @@ class Recipe(models.Model):
     def __str__(self):
         return str(self.recipe_name)
 
+'''
+logger = logging.getLogger('campus_grocery_app')
+
+@receiver(pre_save, sender=Recipe)
+def log_image_path(sender, instance, **kwargs):
+    if instance.image:
+        logger.info(f"Image path: {instance.image.name}")
+'''
 
 class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings')

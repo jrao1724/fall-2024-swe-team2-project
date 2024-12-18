@@ -32,7 +32,7 @@ DEBUG = True
 
 # Image upload capability
 
-MEDIA_URL = '/media/'
+# MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 ALLOWED_HOSTS = ["*"]
@@ -196,4 +196,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://purple-desert-0f588b00f.4.azurestaticapps.net',  # Frontend domain
 ]
 
+AZURE_STORAGE_ACCOUNT_NAME = 'campuscuisinefiles'
+AZURE_STORAGE_ACCOUNT_KEY = os.getenv('AZURE_ACCOUNT_KEY')
+AZURE_BLOB_CONTAINER = 'your-container-name'
 
