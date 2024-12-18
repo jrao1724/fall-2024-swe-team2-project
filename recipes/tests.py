@@ -1,4 +1,5 @@
 import pytest
+import json
 from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse
@@ -6,6 +7,8 @@ from django.db import IntegrityError
 from user_accounts.models import User
 from ingredients.models import Ingredient, RecipeIngredient
 from recipes.models import Recipe, Allergen, DietaryRestriction, Rating
+from django.core.files.uploadedfile import SimpleUploadedFile
+
 
 
 @pytest.mark.django_db
@@ -84,17 +87,7 @@ def test_save_recipe_unauthenticated():
     client = APIClient()
     url = reverse("save-recipe")
     response = client.post(url, {})
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-'''@pytest.mark.django_db
-def test_search_recipes_no_results():
-    client, user, _ = setup()
-    client.force_authenticate(user=user)
-    url = reverse("recipe-search")
-    response = client.post(url, {"search": "NonExistentKeyword"})
-    assert response.status_code == status.HTTP_200_OK
-    assert response.data == []  # No recipes found
-'''    
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED 
 
 @pytest.mark.django_db
 def test_create_recipe_invalid_data():
@@ -103,3 +96,37 @@ def test_create_recipe_invalid_data():
     url = reverse("recipe-list-create")
     response = client.post(url, {"recipe_name": ""})  # Missing required fields
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+@pytest.mark.django_db
+def test_create_recipe_with_image():
+    client, user, recipe_data = setup()
+    
+    # Create a dummy image to upload
+    image = SimpleUploadedFile(
+        name="test_image.jpg",
+        content=b"fake image content",  # This is just fake binary content for the image
+        content_type="image/jpeg"
+    )
+
+    # Convert the nutrition dictionary to a JSON string
+    recipe_data['nutrition'] = json.dumps(recipe_data['nutrition'])
+
+    # Add the image to the recipe data
+    recipe_data['image'] = image
+
+    # Authenticate the client
+    client.force_authenticate(user=user)
+
+    # Send the POST request with the recipe data and image
+    url = reverse("recipe-list-create")
+    response = client.post(url, recipe_data, format="multipart")
+
+    # Assert the response status is HTTP 201 Created
+    assert response.status_code == status.HTTP_201_CREATED
+
+    # Assert that the recipe is created in the database
+    assert Recipe.objects.count() == 1
+    recipe = Recipe.objects.first()
+    assert recipe.recipe_name == recipe_data["recipe_name"]
+    assert recipe.image is not None  # Ensure that the image URL is generated
+    assert "https://" in recipe.image  # Assuming the image URL contains 'https://'
