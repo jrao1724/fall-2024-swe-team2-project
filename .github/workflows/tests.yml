@@ -7,6 +7,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432  # Expose PostgreSQL on port 5432
+
     steps:
       - uses: actions/checkout@v4
 
@@ -25,6 +35,21 @@ jobs:
           source venv/bin/activate
           pip install -r requirements.txt
           pip install pytest-django  # Install pytest-django
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for PostgreSQL to be ready..."
+            sleep 1
+          done
+
+      - name: Set up environment variables for the database
+        run: |
+          echo "DB_NAME=postgres" >> $GITHUB_ENV
+          echo "DB_USER=postgres" >> $GITHUB_ENV
+          echo "DB_PASSWORD=password" >> $GITHUB_ENV
+          echo "DB_HOST=localhost" >> $GITHUB_ENV
+          echo "DB_PORT=5432" >> $GITHUB_ENV
 
       - name: Run tests
         env:
