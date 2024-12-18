@@ -12,10 +12,8 @@ from rest_framework import status
 
 @pytest.fixture
 def authenticated_client(db):
-    # Create a test user
     user = User.objects.create_user(username="testuser", password="testpassword")
     
-    # Create and authenticate the client
     client = APIClient()
     client.login(username="testuser", password="testpassword")
     
@@ -53,7 +51,6 @@ def test_post_str_method():
 
 @pytest.mark.django_db
 def test_post_serializer_valid_data():
-    # Mock the request object
     mock_request = Mock()
     mock_request.user = Mock()
     mock_request.user.username = "testuser"
@@ -66,12 +63,10 @@ def test_post_serializer_valid_data():
         "visible_fields": ["email"]
     }
     
-    # Pass the mock request in the serializer context
     serializer = PostSerializer(data=data, context={'request': mock_request})
     assert serializer.is_valid(), serializer.errors  # Include errors for debugging
     post = serializer.save()
     
-    # Verify that the created post matches the data
     assert post.post_title == "Test Post"
     assert post.post_budget == 500.00
     assert post.created_by == "testuser"
@@ -90,7 +85,6 @@ def test_post_serializer_invalid_visible_fields():
 
 @pytest.mark.django_db
 def test_post_serializer_invalid_visible_fields():
-    # Mock the request object
     mock_request = Mock()
     mock_request.user = Mock()
     mock_request.user.username = "testuser"
@@ -101,7 +95,6 @@ def test_post_serializer_invalid_visible_fields():
         "visible_fields": ["invalid_key"]
     }
 
-    # Pass the mock request in the serializer context
     serializer = PostSerializer(data=data, context={'request': mock_request})
 
     with pytest.raises(ValidationError):
@@ -162,36 +155,32 @@ def test_filter_by_type_view(authenticated_client):
     assert len(response.data) == 1
     assert response.data[0]["post_title"] == "Buy Item" 
 
-'''
+
 from decimal import Decimal
 @pytest.mark.django_db
-def test_add_post(api_client):
-    # Create a user
+def test_add_post(api_client, capsys):
     user = User.objects.create_user(username="testuser", password="password123")
     api_client.force_authenticate(user=user)
 
-    # Valid payload
     payload = {
         "post_title": "Selling Tomatoes",
-        "post_description": "Fresh tomates for sale.",
-        "post_price": "50.00",
-        "post_budget": "60.00",
-        "is_negotiable": True,
+        "post_description": "Fresh tomatoes for sale.",
+        "post_price": 50.00,  
         "post_type": "selling",
-        "visible_fields": ["email"]
+        "user_location": "NYC, NY",
+        "is_active": True,
+        "is_negotiable": True,
+        "visible_fields": ["email"] 
     }
 
-    # POST request
-    url = reverse("post-list-create")
-    response = api_client.post(url, payload)
+    url = reverse("post-list-create") 
+    response = api_client.post(url, payload, format="json") 
+
+    print(response.data) 
 
     assert response.status_code == status.HTTP_201_CREATED
     assert response.data["post_title"] == "Selling Tomatoes"
-    
-   # Capture and print the response using capsys
-    captured = capsys.readouterr()  # Capture output after the test runs
-    print("Captured Output:", captured.out)  # Print captured output
 
-    # Optionally, you can also check for content in the captured output
+    captured = capsys.readouterr()
+    print("Captured Output:", captured.out)  
     assert "Selling Tomatoes" in captured.out
-'''
