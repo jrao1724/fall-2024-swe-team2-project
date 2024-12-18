@@ -5,10 +5,10 @@ import json
 
 class RecipeSerializer(serializers.ModelSerializer):
     allergens = serializers.ListField(
-        child=serializers.CharField(), write_only=True, required=False
+        child=serializers.CharField(), write_only=True, required=False, allow_empty=True
     )
     restrictions = serializers.ListField(
-        child=serializers.CharField(), write_only=True, required=False
+        child=serializers.CharField(), write_only=True, required=False, allow_empty=True
     )
 
     average_rating = serializers.SerializerMethodField()
@@ -43,9 +43,12 @@ class RecipeSerializer(serializers.ModelSerializer):
         return value
 
     def validate_allergens(self, value):
+        if not value:
+            return []
         if isinstance(value, str):
             try:
-                allergens_list = [allergen.strip() for allergen in value.split(',')] 
+                allergens_list = [allergen.strip() for allergen in value.split(',')]
+                print("Returning allergens_list:", allergens_list)
             except json.JSONDecodeError:
                 raise serializers.ValidationError("Invalid JSON format for allergens.")
         elif isinstance(value, list):
@@ -73,17 +76,23 @@ class RecipeSerializer(serializers.ModelSerializer):
         return restrictions_list
 
     def create(self, validated_data):
+        print("Creating allergens data")
         allergens_data = validated_data.pop('allergens', [])
         restrictions_data = validated_data.pop('restrictions', [])
         user = self.context['request'].user
 
         recipe = Recipe.objects.create(**validated_data)
+        if allergens_data:
+            allergens_list = [allergen.strip() for allergen in allergens_data[0].split(',')] 
+            allergens = Allergen.objects.filter(name__in=[name.strip() for name in allergens_list])
+        else:
+            allergens = []
 
-        allergens_list = [allergen.strip() for allergen in allergens_data[0].split(',')] 
-        restrictions_list = [restriction.strip() for restriction in restrictions_data[0].split(',')]
-
-        allergens = Allergen.objects.filter(name__in=[name.strip() for name in allergens_list])
-        restrictions = DietaryRestriction.objects.filter(name__in=[name.strip() for name in restrictions_list])
+        if restrictions_data:
+            restrictions_list = [restriction.strip() for restriction in restrictions_data[0].split(',')]
+            restrictions = DietaryRestriction.objects.filter(name__in=[name.strip() for name in restrictions_list])
+        else:
+            restrictions = []
 
         recipe.allergens.set(allergens)
         recipe.restrictions.set(restrictions)

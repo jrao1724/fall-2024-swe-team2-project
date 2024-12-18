@@ -30,8 +30,8 @@ class RecipeListCreateView(generics.ListCreateAPIView):
                 "nutrition": json.loads(request.POST.get("nutrition", "{}").strip()),
                 "ingredients": request.POST.get("ingredients", "").strip(),
                 "description": request.POST.get("description", "").strip(),
-                "allergens": [allergen.strip() for allergen in request.POST.get("allergens", "").split(",")],
-                "restrictions": [restriction.strip() for restriction in request.POST.get("restrictions", "").split(",")],
+                "allergens": [allergen.strip() for allergen in request.POST.get("allergens", "").split(",")] if type(request.POST.get("allergens", "")) == list else [],
+                "restrictions": [restriction.strip() for restriction in request.POST.get("restrictions", "").split(",")] if type(request.POST.get("restrictions", "")) == list else [],
             }
 
             image = request.FILES.get("image")
