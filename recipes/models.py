@@ -43,7 +43,7 @@ class Recipe(models.Model):
     restrictions = models.ManyToManyField(DietaryRestriction, related_name="recipes", blank=True)
     allergens = models.ManyToManyField(Allergen, related_name="recipes", blank=True)
 
-    image = models.ImageField(upload_to='recipe_images/', blank=True, null=True)
+    image = models.URLField(max_length=500, blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField(default="")
 

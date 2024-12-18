@@ -13,7 +13,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     average_rating = serializers.SerializerMethodField()
     user_rating = serializers.SerializerMethodField()
-    image = serializers.ImageField(required=False, allow_null=True)
+    image = serializers.CharField(required=False, allow_null=True)
 
     class Meta:
         model = Recipe
@@ -73,8 +73,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         return restrictions_list
 
     def create(self, validated_data):
-        print("HITTING HERE")
-        print("VALIDATED DATA:", validated_data)
         allergens_data = validated_data.pop('allergens', [])
         restrictions_data = validated_data.pop('restrictions', [])
         user = self.context['request'].user
