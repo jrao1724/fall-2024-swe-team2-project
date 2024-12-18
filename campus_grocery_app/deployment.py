@@ -55,3 +55,15 @@ DATABASES = {
 }
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Azure Blob Storage Settings
+DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+
+# Replace with your Azure Storage Account details
+AZURE_ACCOUNT_NAME = os.environ['AZURE_ACCOUNT_NAME']  # e.g., campuscuisinefiles
+AZURE_ACCOUNT_KEY = os.environ['AZURE_ACCOUNT_KEY']
+AZURE_CONTAINER = os.environ['AZURE_CONTAINER'] # The container name you created
+
+
+# Media URL points to Azure Blob Storage
+MEDIA_URL = f'https://{AZURE_ACCOUNT_NAME}.blob.core.windows.net/{AZURE_CONTAINER}/'

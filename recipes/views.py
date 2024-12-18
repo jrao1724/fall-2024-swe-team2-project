@@ -5,6 +5,7 @@ from .models import Recipe, Rating, User
 from .serializers import RecipeSerializer, RatingSerializer, SaveRecipeSerializer
 from django.db.models import Q
 import json
+import recipes.azure_blob
 
 # Create your views here.
 # API to create new recipes
@@ -36,7 +37,11 @@ class RecipeListCreateView(generics.ListCreateAPIView):
             image = request.FILES.get("image")
 
             if image:
-                cleaned_data["image"] = image
+                from uuid import uuid4
+
+                file_name = f"recipes/{uuid4()}_{image.name}"
+                blob_url = recipes.azure_blob.upload_image_to_azure(image, file_name)
+                cleaned_data["image"] = blob_url
             else:
                 print("No image uploaded.")
 
@@ -51,7 +56,7 @@ class RecipeListCreateView(generics.ListCreateAPIView):
                 {
                     "message": "Recipe created successfully!",
                     "recipe_id": recipe.recipe_id,
-                    "image_url": request.build_absolute_uri(recipe.image.url) if recipe.image else None,
+                    "image_url": cleaned_data.get("image"),
                 },
                 status=status.HTTP_201_CREATED,
             )
