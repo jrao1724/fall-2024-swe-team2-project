@@ -1,6 +1,10 @@
 from django.db import models
 from ingredients.models import Ingredient, RecipeIngredient
 from user_accounts.models import User
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+import logging
+
 
 class Allergen(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -53,6 +57,14 @@ class Recipe(models.Model):
     def __str__(self):
         return str(self.recipe_name)
 
+'''
+logger = logging.getLogger('campus_grocery_app')
+
+@receiver(pre_save, sender=Recipe)
+def log_image_path(sender, instance, **kwargs):
+    if instance.image:
+        logger.info(f"Image path: {instance.image.name}")
+'''
 
 class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings')

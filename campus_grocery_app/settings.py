@@ -32,7 +32,7 @@ DEBUG = True
 
 # Image upload capability
 
-MEDIA_URL = '/media/'
+#MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 ALLOWED_HOSTS = ["*"]
@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'recipes',
     'ingredients',
     'marketplace',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -196,4 +197,38 @@ CORS_ALLOWED_ORIGINS = [
     'https://purple-desert-0f588b00f.4.azurestaticapps.net',  # Frontend domain
 ]
 
+# Azure Blob Storage Settings
+DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
 
+# Replace with your Azure Storage Account details
+AZURE_ACCOUNT_NAME = 'campuscuisinefiles'  # e.g., campuscuisinefiles
+AZURE_ACCOUNT_KEY = 'sHjo196g3mv/RJvHl+8xvPqrZGJhvGJYIMWL8nccfAKhmynsttgK+r+4n1X9Tbw41vqk6pQ57PPS+ASt2kV0WA=='  # Find this in the Azure portal
+AZURE_CONTAINER = 'media'  # The container name you created
+AZURE_LOCATION = ''  # Optional subfolder in your container (use empty if not needed)
+
+# Media URL points to Azure Blob Storage
+MEDIA_URL = f'https://{AZURE_ACCOUNT_NAME}.blob.core.windows.net/{AZURE_CONTAINER}/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'django_debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'campus_grocery_app': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
