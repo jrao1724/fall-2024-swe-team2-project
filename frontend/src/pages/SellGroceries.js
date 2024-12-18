@@ -238,10 +238,12 @@ const SellGroceries = () => {
               <TextField
                 label="Post Price"
                 variant="outlined"
+                type="number"
                 fullWidth
                 value={postPrice}
                 onChange={(e) => {
-                  if (/^\d*$/.test(e.target.value)) setPostPrice(e.target.value);
+                  //if (/^\d*$/.test(e.target.value)) setPostPrice(e.target.value);
+                  setPostPrice(e.target.value)
                 }}
                 InputProps={{ startAdornment: <Typography>$</Typography> }}
                 style={{ marginBottom: '10px' }}
