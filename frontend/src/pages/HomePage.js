@@ -1,30 +1,11 @@
-import React, { useState } from 'react';
-import { AppBar, Toolbar, Tabs, Tab, Typography, Button, Container, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { AppBar, Toolbar, Tooltip, Tabs, Tab, Typography, Button, Container, Box, Grid2,IconButton } from '@mui/material';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Recipes from './Recipes';
 import GroceryMarketplace from './GroceryMarketplace';
 import ExploreRecipes from './ExploreRecipes';
 import '@fontsource/dancing-script';
-
-// const TabPanel = (props) => {
-//   const { children, value, index, ...other } = props;
-
-//   return (
-//     <div
-//       role="tabpanel"
-//       hidden={value !== index}
-//       id={`tabpanel-${index}`}
-//       aria-labelledby={`tab-${index}`}
-//       {...other}
-//     >
-//       {value === index && (
-//         <Box p={3}>
-//           {children}
-//         </Box>
-//       )}
-//     </div>
-//   );
-// };
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -49,40 +30,27 @@ const TabPanel = (props) => {
 
 const HomePage = () => {
   const [tabValue, setTabValue] = useState(0);
+  
   const navigate = useNavigate();
+  const location = useLocation();
+  const { username } = location.state || {};
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
 
   const handleLogout = () => {
-    navigate('/login'); // Navigate back to login page after clicking logout
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    navigate('/login', { replace: true }); // Navigate back to login page after clicking logout
   };
 
-  // return (
-  //   <Container maxWidth="lg">
-  //     {/* App Bar */}
-  //     <AppBar position="static" color="primary">
-  //       <Toolbar>
-  //         <Tabs value={tabValue} textColor="secondary" indicatorColor="secondary" onChange={handleTabChange} aria-label="recipe tabs">
-  //           <Tab label="Recipes" id="tab-0" aria-controls="tabpanel-0" />
-  //           <Tab label="Grocery Marketplace" id="tab-1" aria-controls="tabpanel-1" />
-  //         </Tabs>
-  //         <Typography variant="h6" style={{ flexGrow: 1 }}></Typography>
-  //         <Button color="inherit" onClick={handleLogout}>Logout</Button>
-  //       </Toolbar>
-  //     </AppBar>
-
-  //     {/* Tab Panels */}
-  //     <TabPanel value={tabValue} index={0}>
-  //       <Recipes />
-  //     </TabPanel>
-
-  //     <TabPanel value={tabValue} index={1}>
-  //       <GroceryMarketplace />
-  //     </TabPanel>
-  //   </Container>
-  // );
+  useEffect(() => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      navigate('/login');
+    }
+  }, [navigate]);
 
   return (
     <Box
@@ -115,20 +83,31 @@ const HomePage = () => {
           >
             Campus Cuisine Exchange
           </Typography>
-          <Button
-            variant="outlined"
-            sx={{
-              color: '#ffffff',
-              borderColor: '#ffffff',
-              '&:hover': {
-                backgroundColor: '#ffffff',
-                color: '#3f51b5',
-              },
-            }}
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
+          <Grid2 container alignItems="center" spacing={1}>
+              <Grid2 item>
+              <Tooltip title={username} arrow>
+                <IconButton color="inherit">
+                  <AccountCircleIcon sx={{ fontSize: 30 }}  />
+                </IconButton>
+              </Tooltip>
+              </Grid2>
+              <Grid2 item>
+              <Button
+                variant="outlined"
+                sx={{
+                  color: '#ffffff',
+                  borderColor: '#ffffff',
+                  '&:hover': {
+                    backgroundColor: '#ffffff',
+                    color: '#3f51b5',
+                  },
+                }}
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+              </Grid2>
+          </Grid2>
         </Toolbar>
       </AppBar>
 
