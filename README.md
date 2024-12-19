@@ -49,3 +49,9 @@ $ psql
 <local>=# alter database campus_grocery_app_db owner to admin;
 ```
 6. Make sure the appropriate fields exist in your `.env` file. Refer to the `.env.example` file to create your own environment variables accordingly.
+
+
+##### Screenshot of Landing Page
+
+![image](https://github.com/user-attachments/assets/ab124e65-049f-43b2-8e02-6c57371db876)
+
