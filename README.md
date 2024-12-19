@@ -55,7 +55,7 @@ $ psql
 
 ![image](https://github.com/user-attachments/assets/ab124e65-049f-43b2-8e02-6c57371db876)
 
-##### Screenshots of Landing and Login Page
+##### Screenshots of Login and SignUp Page (only accepts emails ending with @nyu.edu)
 
 ![image](https://github.com/user-attachments/assets/ad7d0f51-3933-421f-bdca-fd65302075a5)
 ![image](https://github.com/user-attachments/assets/a03e9e86-6e74-4edc-a34b-0b4bd9d1c44b)
