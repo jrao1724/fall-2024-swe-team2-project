@@ -1,5 +1,5 @@
 # Team 2 - SWE Fall '24 - Semester Project
-Project Source Code for Fall 2024 CS-GY 6063: Software Engineering - Dr. Sameri - Team 2
+Project Source Code for Fall 2024 CS-GY 6063: Software Engineering - Dr. Saremi - Team 2
 
 ### Local Development
 ##### React Front End
